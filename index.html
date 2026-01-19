@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>日本富山&岐阜自由行 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f3ef;
+            --card-bg: #ffffff;
+            --primary-color: #2b4c6f;
+            --accent-color: #d64045;
+            --text-color: #333333;
+            --text-light: #777777;
+            --line-color: #e0e0e0;
+            --nav-active-bg: #eef2f6;
+
+            --tag-m-bg: #d64045;
+            --tag-m-text: #ffffff;
+            --tag-o-bg: #888888;
+            --tag-o-text: #ffffff;
+            --tag-food-bg: #f59f00;
+
+            --radius-card: 16px;
+            --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--text-color);
+            padding-bottom: 80px;
+        }
+
+        /* --- Header --- */
+        /* --- Header --- */
+        /* --- Header --- */
+        .app-header {
+            background: #ffffff;
+            padding: 25px 20px 15px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            margin-bottom: 0;
+            color: var(--primary-color);
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-shadow: none;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        /* --- Tabs --- */
+        /* --- Tabs --- */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #ffffff;
+            /* Match header so it blends if scrolled */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 5px 10px 10px 10px;
+            margin-top: 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+            background: transparent;
+            box-shadow: none;
+            border-bottom: 2px solid #f0f0f0;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        .nav-tab.active {
+            box-shadow: none;
+            background: transparent;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            display: block;
+            border-radius: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* --- Day Card --- */
+        .day-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .day-header {
+            background: #dfe6ed;
+            /* Light Blue-Grey from mockup */
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .day-title-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .day-main-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .day-date-str {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary-color);
+            transition: transform 0.3s;
+        }
+
+        .day-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .day-body {
+            display: none;
+            padding: 20px 15px;
+        }
+
+        .day-card.expanded .day-body {
+            display: block;
+        }
+
+        /* --- Timeline UI --- */
+        .timeline-container {
+            position: relative;
+            padding-left: 10px;
+        }
+
+        /* Vertical line */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            bottom: 10px;
+            left: 19px;
+            /* adjust based on dot center */
+            width: 2px;
+            background: #e8e8e8;
+            z-index: 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            /* Center vertically specifically for the dot lineup */
+            margin-bottom: 24px;
+            z-index: 1;
+            min-height: 40px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Dot */
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid #b0c4de;
+            background: white;
+            margin-right: 15px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-dot.nav-dot {
+            border-color: var(--primary-color);
+        }
+
+        .timeline-dot.food-dot {
+            border-color: #f59f00;
+        }
+
+        /* Content */
+        .timeline-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Align button and text */
+            gap: 15px;
+        }
+
+        .timeline-text {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .item-note {
+            font-size: 12px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .tag-m {
+            background: var(--tag-m-bg);
+            color: white;
+        }
+
+        .tag-o {
+            background: var(--tag-o-bg);
+            color: white;
+        }
+
+        .tag-food-icon {
+            font-size: 14px;
+        }
+
+        /* Nav Button */
+        .nav-btn {
+            width: 80px;
+            height: 30px;
+            flex-shrink: 0;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* --- Plan Switcher --- */
+        .plan-switcher-container {
+            margin: 20px 0 20px 35px;
+            /* Indent to align with content */
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 4px;
+            display: flex;
+        }
+
+        .plan-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .plan-option.active {
+            background: white;
+            color: var(--primary-color);
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .plan-block {
+            display: none;
+        }
+
+        .plan-block.visible {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Footer --- */
+        /* --- Footer --- */
+        .app-footer {
+            text-align: center;
+            padding: 30px 0;
+            font-size: 12px;
+            color: #ccc;
+            letter-spacing: 1px;
+            background: transparent;
+            margin-top: 20px;
+        }
+
+        .footer-logo {
+            font-weight: 700;
+            color: #ccc;
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+
+        .flag-icon {
+            width: 32px;
+            height: auto;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            /* Subtle grey border */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            /* Shadow to lift it up */
+            /* vertical-align: bottom; */
+        }
+
+        /* --- Helpers --- */
+        .hidden {
+            display: none !important;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            width: 90px;
+            color: #888;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .info-val {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="app-header">
+        <div class="header-title">
+            <img src="https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg" alt="Japan Flag"
+                class="flag-icon">
+            <span style="margin-left: 10px;">日本富山&岐阜自由行</span>
+        </div>
+        <div class="header-subtitle">2026.02.13 — 2026.02.21 (9天)</div>
+    </header>
+
+    <div class="sticky-nav">
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchView('itinerary')">🗓️ 行程表</div>
+            <div class="nav-tab" onclick="switchView('hotels')">🏨 住宿飯店</div>
+            <div class="nav-tab" onclick="switchView('transport')">✈️ 航班/租車</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="itinerary-view" class="view-section">
+            <!-- Itinerary rendered here -->
+        </div>
+
+        <div id="hotels-view" class="view-section hidden">
+            <!-- Hotels rendered here -->
+        </div>
+
+        <div id="transport-view" class="view-section hidden">
+            <div class="day-card" style="display:block;">
+                <div class="day-header" style="cursor: default;">
+                    <div class="day-main-title">✈️ 航班資訊</div>
+                </div>
+                <div class="day-body" style="display:block;">
+                    <div class="info-row">
+                        <div class="info-label">航空公司</div>
+                        <div class="info-val">長榮航空 (EVA Air)</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">去程 (2/13)</div>
+                        <div class="info-val">06:35 TAIWAN → 10:25 KOMATSU</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">回程 (2/21)</div>
+                        <div class="info-val">11:45 KOMATSU → 14:35 TAIWAN</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">總價</div>
+                        <div class="info-val">TWD 113,480 (All)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card" style="display:block;">
+                <div class="day-header" style="cursor: default;">
+                    <div class="day-main-title">🚗 租車資訊</div>
+                </div>
+                <div class="day-body" style="display:block;">
+                    <div class="info-row">
+                        <div class="info-label">車型</div>
+                        <div class="info-val">COROLLA CROSS HEV<br><span style="font-size:12px;color:#888;">SUV2等級 |
+                                可放2個29吋 | 含ETC</span></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">取車</div>
+                        <div class="info-val">2/13 12:00 小松空港店</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">還車</div>
+                        <div class="info-val">2/20 12:00 金沢駅西口店</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">費用</div>
+                        <div class="info-val">JPY 120,076 (到店付款)<br><span
+                                style="font-size:12px;color:#888;">前7天可免費取消</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="footer-logo">@ELIANA</div>
+    </footer>
+
+    <script>
+        /* Data */
+        const itinerary = [
+            {
+                day: "DAY 1",
+                date: "2/13 (五)",
+                title: "高岡/富山",
+                mapLink: "https://maps.app.goo.gl/9RLQerdrG82Kbj5i9?g_st=ic",
+                items: [
+                    { type: "trans", title: "小松機場取車出發 (約4hr車程)", note: "", link: "" },
+                    { type: "spot", tag: "M", title: "Kanazawa Port Ikiiki Market (魚市場)", note: "午餐、海鮮", link: "" },
+                    { type: "spot", tag: "O", title: "千里濱凪沙道路", note: "沙灘車道", link: "" },
+                    { type: "food", title: "冰見魚市場食堂", note: "", link: "" },
+                    { type: "spot", title: "忍者哈特利機關時鐘", note: "⚠️整點表演", link: "" },
+                    { type: "spot", title: "雨晴海岸", note: "", link: "" },
+                    { type: "spot", title: "瑞龍寺", note: "停車", link: "" },
+                    { type: "spot", title: "高岡古城公園動物園", note: "停車", link: "" },
+                    { type: "spot", title: "高岡大佛", note: "", link: "" },
+                    { type: "spot", title: "哆啦A夢散步道", note: "", link: "" },
+                    { type: "spot", title: "哆啦A夢路面電車", note: "萬葉線", link: "" },
+                    { type: "spot", tag: "O", title: "高岡童話之森公園 (哆啦A夢公園)", note: "", link: "" },
+                    { type: "spot", tag: "M", title: "Shinkoo Bridge (新湊大橋)", note: "", link: "" },
+                    { type: "food", title: "Airbnb 晚餐自理", note: "", link: "https://maps.app.goo.gl/GrfnL5MrVq5RUcSS8" },
+                    { type: "spot", title: "環水公園星巴克", note: "看夜景", link: "" },
+                ]
+            },
+            {
+                day: "DAY 2",
+                date: "2/14 (六)",
+                title: "高岡/富山",
+                items: [
+                    { type: "spot", title: "環水公園", note: "", link: "" },
+                    { type: "spot", title: "富山縣美術館", note: "", link: "" },
+                    { type: "trans", title: "開車移動", note: "", link: "" },
+                    { type: "spot", title: "吳羽山公園展望台", note: "", link: "" },
+                    { type: "food", tag: "O", title: "Mizuhashi Syokudō Gyofu", note: "生魚片 (週六休)", link: "" },
+                    { type: "food", tag: "O", title: "白えび亭 (白蝦亭)", note: "天婦羅", link: "" },
+                    { type: "food", title: "Sushikuinee ! (迴轉壽司)", note: "Toyamafutakuchiten", link: "" },
+                    { type: "spot", title: "富山市役所展望塔", note: "富山停車，步行觀光", link: "" },
+                    { type: "spot", title: "富山城址公園", note: "", link: "" },
+                    { type: "spot", title: "日枝神社", note: "", link: "" },
+                    { type: "spot", title: "富山市玻璃美術館", note: "", link: "" },
+                    { type: "food", tag: "M", title: "糸莊 烏龍麵", note: "", link: "" }
+                ]
+            },
+            {
+                day: "DAY 3",
+                date: "2/15 (日)",
+                title: "高山",
+                mapLink: "https://maps.app.goo.gl/kfgoHFZyVzHWm5YE7",
+                items: [
+                    { type: "food", title: "飯店早餐", note: "", noNav: true, link: "" },
+                    { type: "trans", title: "開車移動 (3.1 hr)", note: "", link: "" },
+                    { type: "spot", title: "新穗高索道", note: "纜車第一段下車，直接去第二段 & 山上用餐", link: "" },
+                    { type: "spot", title: "飛驒大鐘乳石洞", note: "", link: "" },
+                    { type: "spot", title: "日輪神社", note: "", link: "" },
+                    { type: "food", title: "味藏天國", note: "16:30抽號碼牌", link: "" },
+                    { type: "food", title: "舩坂酒造店", note: "", link: "" },
+                    { type: "spot", title: "飛驒之里", note: "晚上看點燈", link: "" }
+                ]
+            },
+            {
+                day: "DAY 4",
+                date: "2/16 (一)",
+                title: "高山",
+                items: [
+                    { type: "food", title: "飯店早餐", note: "", noNav: true, link: "" },
+                    { type: "spot", tag: "M", title: "高山朝市", note: "8點開門", link: "" },
+                    { type: "spot", tag: "M", title: "白川鄉合掌造", note: "限早，8點多要到，9點第一班山頂交通車，大概逛2～3hr", link: "" },
+                    {
+                        type: "split",
+                        plan1: {
+                            name: "Plan 1 (走岐阜)",
+                            mapLink: "https://maps.app.goo.gl/CMKKCxVEDgJS9LFo7?g_st=ic",
+                            items: [
+                                { type: "food", title: "蕎麥麵 (蕎麦正)", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "郡上八幡城", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "三光稲荷神社 / 犬山城", note: "參觀約40mins", link: "" },
+                                { type: "spot", tag: "M", title: "犬山城下町", note: "", link: "" },
+                                { type: "food", title: "蓬ぜん 鰻魚料理", note: "", link: "" },
+                                { type: "spot", tag: "O", title: "岐阜公園 / 岐阜城", note: "維修中", link: "" }
+                            ]
+                        },
+                        plan2: {
+                            name: "Plan 2 (走金澤)",
+                            mapLink: "https://maps.app.goo.gl/LQPfuNmstiSmTgZN8",
+                            items: [
+                                { type: "spot", title: "氣比神宮", note: "", link: "" },
+                                { type: "spot", title: "日本海魚市場", note: "", link: "" },
+                                { type: "spot", title: "敦賀紅磚倉庫", note: "", link: "" }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                day: "DAY 5",
+                date: "2/17 (二)",
+                title: "岐阜市/褔井",
+                items: [
+                    { type: "food", title: "Airbnb 早餐", note: "", link: "" },
+                    {
+                        type: "split",
+                        plan1: {
+                            name: "Plan 1 (走岐阜)",
+                            mapLink: "https://maps.app.goo.gl/ST1HH1cML7oJLc3o7",
+                            items: [
+                                { type: "spot", tag: "M", title: "黑壁廣場", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "氣比神宮", note: "", link: "" },
+                                { type: "food", title: "敦賀歐洲軒 總店", note: "週二沒開?", link: "" },
+                                { type: "spot", tag: "M", title: "日本海魚市場", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "敦賀紅磚倉庫", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "永平寺", note: "15:00前到", link: "" }
+
+                            ]
+                        },
+                        plan2: {
+                            name: "Plan 2 (走金澤)",
+                            mapLink: "https://maps.app.goo.gl/uPcDPVmQTqUMK3ft7",
+                            items: [
+                                { type: "spot", title: "三方五湖", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "永平寺", note: "15:00前到", link: "" }
+                            ]
+                        }
+                    },
+                    { type: "spot", tag: "O", title: "一乘谷朝倉氏遺跡", note: "復原町並", link: "" },
+                    { type: "food", tag: "O", title: "OUR BREWING TAPROOM", note: "啤酒工廠", link: "" },
+                    { type: "food", title: "飯店宵夜", note: "", link: "" },
+                    { type: "trans", title: "福井站黑貓", note: "8:30-20:00", link: "" }
+                ]
+            },
+            {
+                day: "DAY 6",
+                date: "2/18 (三)",
+                title: "敦賀/加賀/褔井",
+                items: [
+                    { type: "food", title: "飯店早餐", note: "", noNav: true, link: "" },
+                    {
+                        type: "split",
+                        plan1: {
+                            name: "Plan 1 (走岐阜)",
+                            mapLink: "https://maps.app.goo.gl/2TzqpAB37a92WcQX9",
+                            items: [
+                                { type: "spot", tag: "M", title: "福井縣立恐龍博物館", note: "1.5hr", link: "" },
+                                { type: "spot", tag: "M", title: "越前大佛", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "平泉寺白山神社", note: "", link: "" },
+                                { type: "spot", tag: "O", title: "越前大野城", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "丸岡城", note: "", link: "" },
+                                { type: "spot", tag: "M", title: "山代溫泉 古總湯", note: "", link: "" },
+                                { type: "spot", tag: "O", title: "鶴仙溪 櫻公園", note: "", link: "" },
+                                { type: "food", title: "加賀依緑園", note: "下午茶?", link: "" }
+                            ]
+                        },
+                        plan2: {
+                            name: "Plan 2 (走金澤)",
+                            mapLink: "https://maps.app.goo.gl/nLpB1y7uiFnzbVwN8",
+                            items: [
+                                { type: "spot", title: "福井縣立恐龍博物館", note: "Klook可買", link: "" },
+                                { type: "spot", title: "越前大佛", note: "", link: "" },
+                                { type: "spot", title: "平泉寺白山神社", note: "", link: "" },
+                                { type: "spot", title: "越前大野城", note: "", link: "" }
+                            ]
+                        }
+                    },
+                    { type: "spot", title: "Check-in お花見久兵衛", note: "15:00", link: "" },
+                    { type: "food", title: "飯店晚餐", note: "", link: "" }
+                ]
+            },
+            {
+                day: "DAY 7",
+                date: "2/19 (四)",
+                title: "加賀/金澤",
+                mapLink: "https://maps.app.goo.gl/51bChJ7bnYankAgY7",
+                items: [
+                    { type: "food", title: "飯店早餐 / 11:00退房", note: "", noNav: true, link: "" },
+                    { type: "trans", title: "開車 (2.25hr)", note: "", link: "" },
+                    { type: "spot", tag: "M", title: "那谷寺", note: "", link: "" },
+                    { type: "spot", title: "岩山 (奇岩遊仙境)", note: "", link: "" },
+                    { type: "spot", tag: "O", title: "好市多 野野市店", note: "", link: "" },
+                    { type: "spot", title: "Check-in Vista Kanazawa", note: "14:00", link: "" },
+                    { type: "spot", title: "三井 Outlet", note: "", link: "" },
+                    { type: "food", title: "麺屋大河", note: "週四限定", link: "" }
+                ]
+            },
+            {
+                day: "DAY 8",
+                date: "2/20 (五)",
+                title: "金澤",
+                mapLink: "https://maps.app.goo.gl/Qeo3t19ZUHFPfJQn8",
+                items: [
+                    { type: "food", title: "金沢港いきいき魚市", note: "早餐", link: "" },
+                    { type: "trans", title: "12:00 還車", note: "金沢駅西口", link: "" },
+                    { type: "spot", title: "近江町市場", note: "", link: "" },
+                    { type: "spot", title: "尾山神社", note: "", link: "" },
+                    { type: "spot", title: "金沢城 鼠多門", note: "", link: "" },
+                    { type: "spot", title: "金澤城 / 兼六園", note: "", link: "" },
+                    { type: "spot", title: "21世紀美術館", note: "泳池需預約", link: "" },
+                    { type: "spot", title: "金澤東茶屋街", note: "15:00~17:00", link: "" },
+                    { type: "food", title: "酒と人情料理 いたる 本店", note: "", link: "" }
+                ]
+            },
+            {
+                day: "DAY 9",
+                date: "2/21 (六)",
+                title: "金澤",
+                items: [
+                    { type: "food", title: "飯店早餐", note: "", noNav: true, link: "" },
+                    { type: "trans", title: "前往小松機場", note: "7:15 或 8:50 出發", link: "https://www.google.com/maps/place/%E5%B0%8F%E6%9D%BE%E6%A9%9F%E5%A0%B4/@36.3928129,136.4034019,17z/data=!3m1!4b1!4m6!3m5!1s0x5ff851366126696f:0x942f95db6a56696f!8m2!3d36.3928086!4d136.4059768!16s%2Fm%2F026820k?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoKLDEwMDc5MjA3MUgBUAM%3D" } // Using search or generic if link unknown but user asked for logic. Wait user didn't give distinct link for airport, just asked to add nav. I'll use query search logic by not setting noNav and treating link logic below. Or better, set explicit query link if I want to be safe. "Komatsu Airport" is standard. I'll use standard search if no link provided.
+                ]
+            }
+        ];
+
+        const hotels = [
+            { date: "🏨 DAY 1 | 2/13 (五)", name: "Airbnb (Toyama)", price: "NT$ 5,380", note: "2/8前免費取消 | 有車位", addr: "1-chōme-4-24 Ushijimahonmachi", link: "https://maps.app.goo.gl/GrfnL5MrVq5RUcSS8" },
+            { date: "🏨 DAY 2 | 2/14 (六)", name: "HOTEL VISCHIO TOYAMA", price: "NT$ 6,609", note: "含早餐 | 2026/1/14前免消 | 需停車", addr: "", link: "" },
+            { date: "🏨 DAY 3 | 2/15 (日)", name: "飛驒高山 WING 國際飯店", price: "JPY 27,939", note: "含早餐 | 已預約車位 (JPY 1000) | 2/13前可取消", addr: "", link: "" },
+            { date: "🏨 DAY 4 | 2/16 (一)", name: "Airbnb (Gifu/Tsuruga)", price: "NT$ 2,981", note: "2/15前免費取消 | 有車位", addr: "35°23'46.5\"N 136°56'46.2\"E", link: "" },
+            { date: "🏨 DAY 5 | 2/17 (二)", name: "Dormy Inn PREMIUM Fukui", price: "JPY 31,499", note: "含早餐 | 2/16前可消 | 車位先到先得", addr: "", link: "" },
+            { date: "🏨 DAY 6 | 2/18 (三)", name: "お花見久兵衛", price: "JPY 65,227", note: "含晚早餐 | 2間日式客房 | 2/13前可取消", addr: "", link: "" },
+            { date: "🏨 DAY 7 - DAY 8 | 2/19 (四) - 2/20 (五)", name: "vista", price: "?", note: "2/16前可取消 | 含早餐", addr: "", link: "" },
+        ];
+
+        /* Render Logic */
+        const views = {
+            itinerary: document.getElementById('itinerary-view'),
+            hotels: document.getElementById('hotels-view'),
+            transport: document.getElementById('transport-view')
+        };
+
+        function switchView(viewName) {
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            const activeIdx = listIdx(viewName);
+            if (activeIdx !== -1) document.querySelectorAll('.nav-tab')[activeIdx].classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function listIdx(name) {
+            if (name === 'itinerary') return 0;
+            if (name === 'hotels') return 1;
+            if (name === 'transport') return 2;
+            return -1;
+        }
+
+        function renderItinerary() {
+            let html = '';
+            itinerary.forEach((day, idx) => {
+                const isFirst = idx === 0;
+                const expanded = isFirst ? 'expanded' : '';
+
+                // Build items
+                let itemsHtml = buildItemsHtml(day.items, `s${idx}`);
+
+                html += `
+                <div class="day-card ${expanded}" onclick="toggleCard(this)">
+                    <div class="day-header">
+                        <div class="day-title-row">
+                            <span class="day-main-title">${day.date} ${day.title}</span>
+                            <span class="day-date-str">${day.day}</span>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                    <div class="day-body" onclick="event.stopPropagation()">
+                        <div class="timeline-container">
+                            ${itemsHtml}
+                            ${day.mapLink ? renderMapBtn(day.mapLink) : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+            document.getElementById('itinerary-view').innerHTML = html;
+        }
+
+        function buildItemsHtml(items, prefix) {
+            let html = '';
+            items.forEach((item, i) => {
+                if (item.type === 'split') {
+                    const id1 = `${prefix}-p1-${i}`;
+                    const id2 = `${prefix}-p2-${i}`;
+
+                    html += `
+                    <div class="plan-switcher-container">
+                        <div class="plan-option active" onclick="switchPlan('${id1}', '${id2}', this)">${item.plan1.name}</div>
+                        <div class="plan-option" onclick="switchPlan('${id2}', '${id1}', this)">${item.plan2.name}</div>
+                    </div>
+                    <div id="${id1}" class="plan-block visible">
+                        ${buildItemsHtml(item.plan1.items, id1)}
+                        ${item.plan1.mapLink ? renderMapBtn(item.plan1.mapLink) : ''}
+                    </div>
+                    <div id="${id2}" class="plan-block">
+                        ${buildItemsHtml(item.plan2.items, id2)}
+                        ${item.plan2.mapLink ? renderMapBtn(item.plan2.mapLink) : ''}
+                    </div>
+                `;
+                } else {
+                    html += renderItem(item);
+                }
+            });
+            return html;
+        }
+
+        function renderItem(item) {
+            // Dot Style
+            let dotClass = '';
+            let dotContent = '';
+            if (item.type === 'food') {
+                dotClass = 'food-dot';
+                dotContent = '🍽️';
+            } else if (item.type === 'trans') {
+                dotClass = 'nav-dot';
+                dotContent = '🚗';
+            } else {
+                dotClass = 'nav-dot';
+            }
+
+            // ... (rest of renderItem) ... 
+
+            // Tag
+            let tagHtml = '';
+            // ...
+            if (item.tag === 'M') tagHtml = `<span class="tag tag-m">M</span>`;
+            if (item.tag === 'O') tagHtml = `<span class="tag tag-o">O</span>`;
+            if (item.type === 'food' && !item.tag) tagHtml = `<span class="tag" style="font-size:16px;">🍽️</span>`;
+
+            // Nav Button
+            let btnHtml = '';
+
+            let navLink = item.link;
+            if (!navLink && !item.noNav && (item.type !== 'trans' && item.type !== 'none')) {
+                navLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title)}`;
+            }
+
+            if (navLink) {
+                btnHtml = `
+                <a href="${navLink}" target="_blank" class="nav-btn">
+                    導航前往
+                </a>
+            `;
+            }
+            return `
+            <div class="timeline-item">
+                <div class="timeline-dot ${dotClass}" style="display:flex;align-items:center;justify-content:center;font-size:10px;">
+                    ${item.type === 'trans' ? '🚗' : ''}
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-text">
+                        <div class="item-name">
+                            ${tagHtml}
+                            <span>${item.title}</span>
+                        </div>
+                        <div class="item-note">${item.note}</div>
+                    </div>
+                    ${btnHtml}
+                </div>
+            </div>
+        `;
+        }
+
+        function renderMapBtn(link) {
+            return `
+            <div style="margin-top: 15px; margin-bottom: 5px;">
+                <a href="${link}" target="_blank" class="nav-btn" style="width: 100%; height: 38px; background-color: #f8f9fa; border: 1px dashed var(--primary-color); display:flex; align-items:center; justify-content:center; text-decoration:none; color:var(--primary-color); font-weight:700;">
+                    🗺️ 開啟整日行程導航
+                </a>
+            </div>
+            `;
+        }
+
+        function renderHotels() {
+            let html = '';
+            hotels.forEach(h => {
+                html += `
+                <div class="day-card" style="display:block;">
+                    <div class="day-header" style="cursor:default;">
+                        <span class="day-main-title">${h.date}</span>
+                    </div>
+                    <div class="day-body" style="display:block; padding-top:10px;">
+                        <div class="info-row">
+                            <div class="info-label">飯店</div>
+                            <div class="info-val">${h.name}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">價格</div>
+                            <div class="info-val">${h.price}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">備註</div>
+                            <div class="info-val">${h.note}</div>
+                        </div>
+                        ${h.addr ? `
+                        <div class="info-row">
+                            <div class="info-label">地址</div>
+                            <div class="info-val" style="font-size:12px;">${h.addr}</div>
+                        </div>` : ''}
+                        
+                        <!-- Hotel Nav Button -->
+                        <div style="margin-top: 15px;">
+                            <a href="${h.link ? h.link : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(h.name)}" 
+                               target="_blank" class="nav-btn" 
+                               style="width: 100%; height: 36px; border-radius: 8px; border: 1px solid var(--primary-color);">
+                                導航
+                            </a>
+                        </div>
+                    </div>
+                </div>
+             `;
+            });
+            document.getElementById('hotels-view').innerHTML = html;
+        }
+
+        /* Interactions */
+        function toggleCard(el) {
+            el.classList.toggle('expanded');
+        }
+
+        function switchPlan(showId, hideId, btnEl) {
+            // Toggle Active Button
+            const parent = btnEl.parentElement;
+            Array.from(parent.children).forEach(c => c.classList.remove('active'));
+            btnEl.classList.add('active');
+
+            // Toggle Content
+            document.getElementById(showId).classList.add('visible');
+            document.getElementById(hideId).classList.remove('visible');
+
+            // Stop propagation to prevent card collapse
+            event.stopPropagation();
+        }
+
+        // Init
+        renderItinerary();
+        renderHotels();
+
+    </script>
+</body>
+
+</html>
