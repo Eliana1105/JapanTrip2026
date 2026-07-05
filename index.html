@@ -440,6 +440,114 @@
             color: #333;
             flex: 1;
         }
+
+        /* --- Checklist --- */
+        .checklist-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .checklist-body {
+            padding: 18px 15px 20px;
+        }
+
+        .checklist-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .checklist-input {
+            flex: 1;
+            min-width: 0;
+            height: 40px;
+            border: 1px solid var(--line-color);
+            border-radius: 10px;
+            padding: 0 12px;
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        .checklist-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(43, 76, 111, 0.12);
+        }
+
+        .checklist-add-btn {
+            width: 76px;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .checklist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 44px;
+            padding: 8px 10px;
+            border: 1px solid #eeeeee;
+            border-radius: 10px;
+            background: #fbfbfb;
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .checklist-text {
+            flex: 1;
+            min-width: 0;
+            font-size: 15px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .checklist-item.done .checklist-text {
+            color: var(--text-light);
+            text-decoration: line-through;
+        }
+
+        .checklist-delete-btn {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #eeeeee;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--accent-color);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checklist-empty {
+            padding: 18px 10px 8px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -459,6 +567,7 @@
             <div class="nav-tab active" onclick="switchView('itinerary')">🗓️ 行程表</div>
             <div class="nav-tab" onclick="switchView('hotels')">🏨 住宿飯店</div>
             <div class="nav-tab" onclick="switchView('transport')">✈️ 航班/租車</div>
+            <div class="nav-tab" onclick="switchView('checklist')">✅ 行前清單</div>
         </div>
     </div>
 
@@ -469,6 +578,26 @@
 
         <div id="hotels-view" class="view-section hidden">
             <!-- Hotels rendered here -->
+        </div>
+
+        <div id="checklist-view" class="view-section hidden">
+            <div class="checklist-card">
+                <div class="day-header" style="cursor: default;">
+                    <div class="day-title-row">
+                        <span class="day-main-title">旅遊行前 Checklist</span>
+                        <span class="day-date-str">新增、勾選與整理出發前待辦</span>
+                    </div>
+                </div>
+                <div class="checklist-body">
+                    <form class="checklist-form" id="checklist-form">
+                        <input id="checklist-input" class="checklist-input" type="text" placeholder="新增行前準備項目"
+                            autocomplete="off">
+                        <button class="checklist-add-btn" type="submit">新增</button>
+                    </form>
+                    <div id="checklist-list" class="checklist-list"></div>
+                    <div id="checklist-empty" class="checklist-empty hidden">目前沒有 checklist 項目</div>
+                </div>
+            </div>
         </div>
 
         <div id="transport-view" class="view-section hidden">
@@ -757,8 +886,12 @@
         const views = {
             itinerary: document.getElementById('itinerary-view'),
             hotels: document.getElementById('hotels-view'),
-            transport: document.getElementById('transport-view')
+            transport: document.getElementById('transport-view'),
+            checklist: document.getElementById('checklist-view')
         };
+
+        const checklistStorageKey = 'japan-trip-2026-checklist';
+        let checklistItems = loadChecklist();
 
         function switchView(viewName) {
             Object.values(views).forEach(v => v.classList.add('hidden'));
@@ -775,6 +908,7 @@
             if (name === 'itinerary') return 0;
             if (name === 'hotels') return 1;
             if (name === 'transport') return 2;
+            if (name === 'checklist') return 3;
             return -1;
         }
 
@@ -964,9 +1098,89 @@
             event.stopPropagation();
         }
 
+        function loadChecklist() {
+            try {
+                const raw = localStorage.getItem(checklistStorageKey);
+                return raw ? JSON.parse(raw) : [];
+            } catch (err) {
+                return [];
+            }
+        }
+
+        function saveChecklist() {
+            localStorage.setItem(checklistStorageKey, JSON.stringify(checklistItems));
+        }
+
+        function addChecklistItem(text) {
+            const cleanText = text.trim();
+            if (!cleanText) return;
+
+            checklistItems.push({
+                id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+                text: cleanText,
+                done: false
+            });
+            saveChecklist();
+            renderChecklist();
+        }
+
+        function toggleChecklistItem(id) {
+            checklistItems = checklistItems.map(item =>
+                item.id === id ? { ...item, done: !item.done } : item
+            );
+            saveChecklist();
+            renderChecklist();
+        }
+
+        function deleteChecklistItem(id) {
+            checklistItems = checklistItems.filter(item => item.id !== id);
+            saveChecklist();
+            renderChecklist();
+        }
+
+        function escapeHtml(value) {
+            return value.replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char]));
+        }
+
+        function renderChecklist() {
+            const listEl = document.getElementById('checklist-list');
+            const emptyEl = document.getElementById('checklist-empty');
+
+            emptyEl.classList.toggle('hidden', checklistItems.length > 0);
+            listEl.innerHTML = checklistItems.map(item => `
+                <div class="checklist-item ${item.done ? 'done' : ''}">
+                    <input class="checklist-checkbox" type="checkbox" ${item.done ? 'checked' : ''}
+                        onchange="toggleChecklistItem('${item.id}')">
+                    <div class="checklist-text">${escapeHtml(item.text)}</div>
+                    <button class="checklist-delete-btn" type="button" aria-label="刪除"
+                        onclick="deleteChecklistItem('${item.id}')">×</button>
+                </div>
+            `).join('');
+        }
+
+        function bindChecklistForm() {
+            const form = document.getElementById('checklist-form');
+            const input = document.getElementById('checklist-input');
+
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                addChecklistItem(input.value);
+                input.value = '';
+                input.focus();
+            });
+        }
+
         // Init
         renderItinerary();
         renderHotels();
+        renderChecklist();
+        bindChecklistForm();
 
     </script>
 </body>
